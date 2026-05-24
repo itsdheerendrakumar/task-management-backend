@@ -1,8 +1,15 @@
 import jwt from "jsonwebtoken";
+import type { DecodedToken } from "./types";
 
-export function generateToken(payload: object, type: "access" | "refresh"): string {
+export function generateToken(payload: object, type: "access" | "refresh", duration?: string): string {
     const secretKey = type === "access" ? process.env.JWT_SECRET_ACCESS : process.env.JWT_SECRET_REFRESH;
-    const expiresIn = type === "access" ? process.env.ACCESS_TOKEN_EXPIRATION : process.env.REFRESH_TOKEN_EXPIRATION;
+    const expiresIn = duration || (type === "access" ? process.env.ACCESS_TOKEN_EXPIRATION : process.env.REFRESH_TOKEN_EXPIRATION);
     const token = jwt.sign(payload, secretKey, { expiresIn });
     return token;
+}
+
+export function verifyToken(token: string, type: "access" | "refresh"): DecodedToken {
+    const secretKey = type === "access" ? process.env.JWT_SECRET_ACCESS : process.env.JWT_SECRET_REFRESH;
+    const decoded = jwt.verify(token, secretKey!) as DecodedToken;
+    return decoded;
 }

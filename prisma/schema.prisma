@@ -20,11 +20,12 @@ enum Role {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  role     Role    @default(member)
-  password String
+  id            Int     @id @default(autoincrement())
+  email         String  @unique
+  name          String?
+  role          Role    @default(member)
+  password      String
+  profile_image String?
 
   session Session[]
 }
