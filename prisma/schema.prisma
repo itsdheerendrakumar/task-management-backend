@@ -33,7 +33,6 @@ model User {
 model Session {
   id            String   @id
   user_id       Int
-  family_id     String
   refresh_token String
   expires_at    DateTime
 
