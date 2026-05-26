@@ -1,25 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
-import { registerSchema } from "./auth.validation.js";
-import { hashPassword } from "../../utils/hashPassword.js";
-import { prisma } from "../../lib/prisma.js"
-import { loginService, refreshTokenService } from "./auth.service.js";
+import { loginService, refreshTokenService, registerService } from "./auth.service.js";
 import { successResponse } from "../../utils/response.js";
 import type { CustomRequest } from "../../utils/types.js";
-export const register = async (req: Request, res: Response, next: NextFunction) => {
-  const validatedData = registerSchema.parse(req.body);
-  const hashedPassword = hashPassword(validatedData.password);
-  const user = await prisma.user.create({
-    data: {
-      name: validatedData.name,
-      email: validatedData.email,
-      password: hashedPassword,
-      role: "admin"
-    },
-  });
-  res.json({
-    success: true,
-    data: user,
-  });
+export const register = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  const result = await registerService(req.body);
+  res.status(201).json(successResponse("User registered successfully", result));
 };
 
 export async function login(req: Request, res: Response, next: NextFunction) {

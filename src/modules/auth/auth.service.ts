@@ -3,8 +3,9 @@ import { createUuid } from "../../utils/createUuid";
 import { ErrorResponse } from "../../utils/errorResponse";
 import { hashPassword } from "../../utils/hashPassword";
 import { generateToken, verifyToken } from "../../utils/jwt";
-import { findUserByEmail, storeSession, findSessionById, deleteSessionById, updateSession } from "./auth.repository";
-import { loginSchema } from "./auth.validation";
+import type { RegisterUser } from "./auth.dtos";
+import { findUserByEmail, storeSession, findSessionById, deleteSessionById, updateSession, creeateNewUser } from "./auth.repository";
+import { loginSchema, registerSchema } from "./auth.validation";
 import z from "zod"
 export async function loginService(body: z.infer<typeof loginSchema>) {
     const validatedData = loginSchema.parse(body);
@@ -22,6 +23,18 @@ export async function loginService(body: z.infer<typeof loginSchema>) {
     const hashedToken = hashPassword(refreshToken);
     await storeSession(user.id, hashedToken, id);
     return {accessToken, refreshToken};
+}
+
+export async function registerService(body: RegisterUser) {
+    const validatedData = registerSchema.parse(body);
+    const existingUser = await findUserByEmail(validatedData.email);
+    if(existingUser) {
+        throw new ErrorResponse("Email already in use", 400);
+    }
+    const hashedPassword = hashPassword(validatedData.password);
+    validatedData.password = hashedPassword;
+    const user = await creeateNewUser(validatedData);
+    return user;
 }
 
 export async function refreshTokenService(refreshToken: string) {
