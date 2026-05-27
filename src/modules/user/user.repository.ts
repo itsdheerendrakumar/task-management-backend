@@ -19,3 +19,17 @@ export async function getProfileRepository(userId: number) {
     }
     return user;
 }
+
+export async function getUserListingRepository() {
+    const users = await prisma.user.findMany({
+        where: {role: {not: "admin"}},
+        select: {
+            name: true,
+            email: true,
+            role: true,
+            id: true,
+            profile_image: true     
+        }
+    });
+    return users;
+}

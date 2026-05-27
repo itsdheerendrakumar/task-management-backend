@@ -18,7 +18,7 @@ export async function loginService(body: z.infer<typeof loginSchema>) {
         throw new ErrorResponse("Invalid credentials", 400);
     }
     const id = createUuid(); // this is is used for inddentifying session because user can lgoin from multiple devices  
-    const accessToken = generateToken({ id, user_id: user.id}, "access");
+    const accessToken = generateToken({ id, user_id: user.id, role: user.role }, "access");
     const refreshToken = generateToken({ id, user_id: user.id}, "refresh");
     const hashedToken = hashPassword(refreshToken);
     await storeSession(user.id, hashedToken, id);
@@ -31,9 +31,8 @@ export async function registerService(body: RegisterUser) {
     if(existingUser) {
         throw new ErrorResponse("Email already in use", 400);
     }
-    const hashedPassword = hashPassword(validatedData.password);
-    validatedData.password = hashedPassword;
-    const user = await creeateNewUser(validatedData);
+    const hashedPassword = hashPassword("temporaryPassord");
+    const user = await creeateNewUser({...validatedData, password: hashedPassword});
     return user;
 }
 
@@ -52,9 +51,9 @@ export async function refreshTokenService(refreshToken: string) {
     if(!isValid) {
         throw new ErrorResponse("Invalid refresh token", 401);
     }
-    const newAccessToken = generateToken({ id: session.id, user_id: session.user_id}, "access");
+    const newAccessToken = generateToken({ id: session.id, user_id: session.user.id, role: session.user.role }, "access");
     const remainingDuration = session.expires_at.getTime() - now;
-    const newRefreshToken = generateToken({ id: session.id, user_id: session.user_id}, "refresh", remainingDuration);
+    const newRefreshToken = generateToken({ id: session.id, user_id: session.user.id}, "refresh", remainingDuration);
     const hashedToken = hashPassword(newRefreshToken);
     await updateSession(session.id, hashedToken, remainingDuration);
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };

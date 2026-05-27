@@ -11,10 +11,7 @@ export const registerSchema = z.object({
     .string()
     .email("Invalid email"),
 
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters"),
-    role: z.enum(["member", "client", "projectManager"], "Role must be either 'member', 'client', or 'projectManager'"),
+  role: z.enum(["member", "client", "projectManager"], "Role must be either 'member', 'client', or 'projectManager'"),
 });
 
 export const loginSchema = z.object({
