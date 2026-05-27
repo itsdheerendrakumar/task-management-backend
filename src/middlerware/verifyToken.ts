@@ -1,14 +1,17 @@
 import type { NextFunction, Request, Response } from "express";
 import { verifyToken } from "../utils/jwt"
 import { ErrorResponse } from "../utils/errorResponse";
-import type { CustomRequest, DecodedToken } from "../utils/types";
-export async function authVerification(req: CustomRequest, res: Response, next: NextFunction) {
-    const {accessToken, refreshToken} = req.cookies;
-    try {
-        const decoded = verifyToken(accessToken, "access") as DecodedToken;
+import type { CustomRequest, DecodedToken, UserRoles } from "../utils/types";
+
+export function authVerification(roles?: UserRoles[]) {
+    return async function authVerification(req: CustomRequest, res: Response, next: NextFunction) {
+        const { accessToken, refreshToken } = req.cookies;
+        const decoded = verifyToken(accessToken ?? "", "access") as DecodedToken;
         req.user = decoded;
+        if (!roles?.includes(decoded.role) && roles) {
+            next(new ErrorResponse("Insufficient permissions", 403));
+            return;
+        }
         next();
-    } catch (error) {
-        next(new ErrorResponse("Invalid access token", 401));
     }
 }
