@@ -31,7 +31,7 @@ export async function registerService(body: RegisterUser) {
     if(existingUser) {
         throw new ErrorResponse("Email already in use", 400);
     }
-    const hashedPassword = hashPassword("temporaryPassord");
+    const hashedPassword = hashPassword(validatedData.password);
     const user = await creeateNewUser({...validatedData, password: hashedPassword});
     return user;
 }
