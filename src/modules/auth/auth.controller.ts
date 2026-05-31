@@ -1,0 +1,39 @@
+import type { NextFunction, Request, Response } from "express";
+import { loginService, refreshTokenService, registerService } from "./auth.service.js";
+import { successResponse } from "../../utils/response.js";
+import type { CustomRequest } from "../../utils/types.js";
+export const register = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  const result = await registerService(req.body);
+  res.status(201).json(successResponse("User registered successfully", result));
+};
+
+export async function login(req: Request, res: Response, next: NextFunction) {
+  const result = await loginService(req.body);
+  res.cookie("refreshToken", result.refreshToken, {
+    httpOnly: true,
+    secure: true,
+  });
+  res.cookie("accessToken", result.accessToken, {
+    httpOnly: true,
+    secure: true,
+  });
+
+  res.status(200).json(successResponse("Logged in successfully"));
+}
+
+export async function refreshToken(req: CustomRequest, res: Response, next: NextFunction) {
+  const { refreshToken } = req.cookies;
+  if (!refreshToken) {
+    return res.status(401).json({ success: false, message: "Refresh token missing" });
+  }
+  const result = await refreshTokenService(refreshToken);
+  res.cookie("refreshToken", result.refreshToken, {
+    httpOnly: true,
+    secure: true,
+  });
+  res.cookie("accessToken", result.accessToken, {
+    httpOnly: true,
+    secure: true,
+  });
+  res.status(200).json(successResponse("Token refreshed successfully"));
+}

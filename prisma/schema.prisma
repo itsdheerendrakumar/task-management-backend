@@ -12,8 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
-
 enum Role {
   admin
   projectManager
@@ -22,9 +20,23 @@ enum Role {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  role  Role    @default(member)
-  password String
+  id            Int     @id @default(autoincrement())
+  email         String  @unique
+  name          String?
+  role          Role    @default(member)
+  password      String
+  profile_image String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  session Session[]
+}
+
+model Session {
+  id            String   @id
+  user_id       Int
+  refresh_token String
+  expires_at    DateTime
+
+  user User @relation(fields: [user_id], references: [id])
 }
