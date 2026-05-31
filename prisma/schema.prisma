@@ -19,6 +19,11 @@ enum Role {
   member
 }
 
+enum TaskStatus {
+  pending
+  completed
+}
+
 model User {
   id            Int     @id @default(autoincrement())
   email         String  @unique
@@ -30,6 +35,9 @@ model User {
   updated_at DateTime @default(now()) @updatedAt
 
   session Session[]
+  task Task[]
+  subtask Subtask[]
+  task_participants TaskParticipants[]
 }
 
 model Session {
@@ -39,4 +47,44 @@ model Session {
   expires_at    DateTime
 
   user User @relation(fields: [user_id], references: [id])
+}
+
+model Task {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  deadline DateTime
+  notes String
+  created_by Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  status TaskStatus
+  subtask Subtask[]
+  task_participants TaskParticipants[]
+
+  creater User @relation(fields: [created_by], references: [id])
+}
+
+model Subtask {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  status TaskStatus
+  task_id Int
+  created_by Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  creater User @relation(fields: [created_by], references: [id])
+  task Task @relation(fields: [task_id], references: [id])
+}
+
+model TaskParticipants {
+  user_id Int
+  role Role
+  task_id Int
+  @@id([task_id, user_id])
+
+  user User @relation(fields: [user_id], references: [id])
+  task Task @relation(fields: [task_id], references: [id])
 }
