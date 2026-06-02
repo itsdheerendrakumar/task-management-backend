@@ -12,10 +12,12 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   res.cookie("refreshToken", result.refreshToken, {
     httpOnly: true,
     secure: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   res.cookie("accessToken", result.accessToken, {
     httpOnly: true,
     secure: true,
+    maxAge: 15 * 60 * 1000,
   });
 
   res.status(200).json(successResponse("Logged in successfully"));
