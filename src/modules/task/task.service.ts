@@ -1,6 +1,6 @@
 ﻿import type { UserRoles } from "../../utils/types"
 import type { CreateTask, TaskStatus } from "./task.dtos"
-import { createTaskRepository, TaskListingRepository } from "./task.repository"
+import { createTaskRepository, TaskListingRepository, getTaskMetricsRepository, getLastOneYearTaskMonthWiseRepository} from "./task.repository"
 import { createTaskSchema } from "./task.validation"
 
 export async function createTaskService(
@@ -16,4 +16,14 @@ export async function createTaskService(
 export async function getTaskListingService(user_id: number, status: TaskStatus) {
   const listing = await TaskListingRepository(user_id, status);
   return listing;
+}
+
+export async function getTaskMetricsService(user_id: number, role: UserRoles) {
+  const metrics = await getTaskMetricsRepository(user_id, role);
+  return metrics;
+}
+
+export async function getLastOneYearTaskMonthWiseService(user_id: number) {
+  const metrics = await getLastOneYearTaskMonthWiseRepository(user_id);
+  return metrics;
 }

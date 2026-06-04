@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { loginService, refreshTokenService, registerService } from "./auth.service.js";
+import { loginService, refreshTokenService, registerService, logoutService } from "./auth.service.js";
 import { successResponse } from "../../utils/response.js";
 import type { CustomRequest } from "../../utils/types.js";
 export const register = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -38,4 +38,16 @@ export async function refreshToken(req: CustomRequest, res: Response, next: Next
     secure: true,
   });
   res.status(200).json(successResponse("Token refreshed successfully"));
+}
+
+export async function logout(req: CustomRequest, res: Response, next: NextFunction) {
+  const { accessToken, refreshToken } = req.cookies;
+  const token = accessToken ?? refreshToken;
+  if (!token) {
+    return res.status(401).json({ success: false, message: "No token provided" });
+  }
+  await logoutService(token, accessToken ? "access" : "refresh");
+  res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+  res.clearCookie("accessToken", { httpOnly: true, secure: true });
+  res.status(200).json(successResponse("Logged out successfully"));
 }

@@ -1,5 +1,5 @@
 import express from "express";
-import { login, refreshToken, register } from "./auth.controller.js";
+import { login, refreshToken, register, logout } from "./auth.controller.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { authVerification } from "../../middlerware/verifyToken.js";
 const router = express.Router();
@@ -18,5 +18,10 @@ router.post(
 router.get(
     "/refresh", 
     asyncHandler(refreshToken)
+)
+
+router.post(
+    "/logout",
+    asyncHandler(logout)
 )
 export default router;

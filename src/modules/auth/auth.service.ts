@@ -58,3 +58,8 @@ export async function refreshTokenService(refreshToken: string) {
     await updateSession(session.id, hashedToken, remainingDuration);
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 }
+
+export async function logoutService(token: string, type: "access" | "refresh") {
+    const decoded = verifyToken(token, type);
+    await deleteSessionById(decoded.id);
+}

@@ -12,3 +12,10 @@ export interface GetTaskPayload extends CustomRequest {
         type: TaskStatus
     }
 }
+
+export interface TaskMetrics {
+    totaltask: number
+    pendingTask: number
+    completedTask: number
+    overedueTask: number
+}
