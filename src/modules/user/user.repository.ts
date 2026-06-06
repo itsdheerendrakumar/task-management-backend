@@ -1,6 +1,7 @@
 import { prisma } from "../../lib/prisma";
 import { ErrorResponse } from "../../utils/errorResponse";
 import type { UserRoles } from "../../utils/types";
+import type { Prisma } from "../../../generated/prisma/client";
 
 export async function getProfileRepository(userId: number) {
     const user = await prisma.user.findUnique({
@@ -49,4 +50,24 @@ export async function getUserSelectListingRepository(roles: UserRoles[]) {
         }
     })
     return listing;
+}
+
+export async function updateProfileRepository(userId: number, data: {name?: string | null; profile_image?: string | null}) {
+        const updateData: Prisma.UserUpdateInput = {
+            ...(typeof data.name !== "undefined" ? { name: data.name } : {}),
+            ...(typeof data.profile_image !== "undefined" ? { profile_image: data.profile_image } : {})
+        };
+
+        const user = await prisma.user.update({
+            where: { id: +userId },
+            data: updateData,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                profile_image: true
+            }
+        });
+        return user;
 }
