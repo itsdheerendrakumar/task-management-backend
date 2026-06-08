@@ -1,5 +1,5 @@
-import type { NextFunction, Response } from "express";
-import { getProfileService, getUserListingService, getUserSelectListingService, changeProfileService, type ChangeProfilePayload } from "./user.service";
+import type { NextFunction, Response, Request } from "express";
+import { getProfileService, getUserListingService, getUserSelectListingService, changeProfileService, changePasswordService, type ChangeProfilePayload, type ChangePasswordPayload } from "./user.service";
 import { successResponse } from "../../utils/response";
 import type { CustomRequest, UserRoles } from "../../utils/types";
 
@@ -30,4 +30,11 @@ export async function changeProfile(req: CustomRequest, res: Response, next: Nex
 
     const user = await changeProfileService(decoded?.user_id, payload);
     return res.status(201).json(successResponse("Profile detail updated successfully", user));
+}
+
+export async function changePassword(req: CustomRequest, res: Response, next: NextFunction) {
+    const { user: decoded } = req;
+    const payload = req.body as ChangePasswordPayload;
+    await changePasswordService(decoded?.user_id, payload);
+    return res.status(200).json(successResponse("Password changed successfully"));
 }

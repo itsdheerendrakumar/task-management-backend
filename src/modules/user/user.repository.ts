@@ -52,6 +52,35 @@ export async function getUserSelectListingRepository(roles: UserRoles[]) {
     return listing;
 }
 
+export async function getUserWithPasswordRepository(userId: number) {
+    const user = await prisma.user.findUnique({
+        where: { id: +userId },
+        select: {
+            id: true,
+            password: true
+        }
+    });
+    if (!user) {
+        throw new ErrorResponse("User not found", 400);
+    }
+    return user;
+}
+
+export async function updatePasswordRepository(userId: number, password: string) {
+    const user = await prisma.user.update({
+        where: { id: +userId },
+        data: { password },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            profile_image: true
+        }
+    });
+    return user;
+}
+
 export async function updateProfileRepository(userId: number, data: {name?: string | null; profile_image?: string | null}) {
         const updateData: Prisma.UserUpdateInput = {
             ...(typeof data.name !== "undefined" ? { name: data.name } : {}),

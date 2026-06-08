@@ -1,6 +1,6 @@
 import express from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
-import { changeProfile, getProfile, getUserListing, getUserSelectListing } from "./user.controller.js";
+import { changeProfile, changePassword, getProfile, getUserListing, getUserSelectListing } from "./user.controller.js";
 import { authVerification } from "../../middlerware/verifyToken.js";
 import { getProfileUpateMethod } from "./multer.js";
 const router = express.Router();
@@ -14,5 +14,10 @@ router.patch(
     asyncHandler(authVerification()),
     getProfileUpateMethod().single("profile_image"),
     asyncHandler(changeProfile)
+);
+router.patch(
+    "/change-password",
+    asyncHandler(authVerification()),
+    asyncHandler(changePassword)
 );
 export default router;
