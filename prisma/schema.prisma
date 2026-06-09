@@ -29,6 +29,32 @@ enum TaskStatus {
   completed
 }
 
+enum ActivityAction {
+  task_created
+  task_updated
+  task_deleted
+
+  task_assigned
+  task_unassigned
+  task_status_changed
+  task_deadline_changed
+
+  subtask_created
+  subtask_updated
+  subtask_deleted
+
+  subtask_assigned
+  subtask_unassigned
+  subtask_status_changed
+
+  user_created
+  user_updated
+
+  role_changed
+  user_activated
+  user_deactivated
+}
+
 model User {
   id            Int      @id @default(autoincrement())
   email         String   @unique
@@ -46,6 +72,7 @@ model User {
   chat              Chats[]
   chat_participant  ChatParticipants[]
   message           Messages[]
+  acttivity         Activities[]
 }
 
 model Session {
@@ -135,4 +162,18 @@ model Messages {
 
   chat Chats @relation(fields: [chat_id], references: [id])
   user User  @relation(fields: [sender_id], references: [id])
+}
+
+model Activities {
+  id           Int            @id @default(autoincrement())
+  action       ActivityAction
+  message      String
+  task_id      Int?
+  subtask_id   Int?
+  meta_data    Json?
+  performed_by Int
+  user         User           @relation(fields: [performed_by], references: [id])
+  created_at   DateTime       @default(now())
+
+  @@index([performed_by])
 }
