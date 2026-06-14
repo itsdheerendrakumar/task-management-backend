@@ -19,25 +19,61 @@ enum Role {
   member
 }
 
+enum ChatType {
+  private
+  group
+}
+
 enum TaskStatus {
   pending
   completed
 }
 
+enum ActivityAction {
+  task_created
+  task_updated
+  task_deleted
+
+  task_assigned
+  task_unassigned
+  task_status_changed
+  task_deadline_changed
+
+  subtask_created
+  subtask_updated
+  subtask_deleted
+
+  subtask_assigned
+  subtask_unassigned
+  subtask_status_changed
+
+  user_created
+  user_updated
+  user_login
+  user_logout
+  role_changed
+  user_activated
+  user_deactivated
+}
+
 model User {
-  id            Int     @id @default(autoincrement())
-  email         String  @unique
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
   name          String?
-  role          Role    @default(member)
+  role          Role     @default(member)
   password      String
   profile_image String?
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
 
-  session Session[]
-  task Task[]
-  subtask Subtask[]
+  session           Session[]
+  task              Task[]
+  subtask           Subtask[]
   task_participants TaskParticipants[]
+  chat              Chats[]
+  chat_participant  ChatParticipants[]
+  message           Messages[]
+  acttivity         Activities[]
 }
 
 model Session {
@@ -50,41 +86,95 @@ model Session {
 }
 
 model Task {
-  id Int @id @default(autoincrement())
-  name String
-  description String
-  deadline DateTime
-  notes String
-  created_by Int
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
-  status TaskStatus
-  subtask Subtask[]
+  id                Int                @id @default(autoincrement())
+  name              String
+  description       String
+  deadline          DateTime
+  notes             String
+  created_by        Int
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @default(now()) @updatedAt
+  status            TaskStatus
+  subtask           Subtask[]
   task_participants TaskParticipants[]
 
   creater User @relation(fields: [created_by], references: [id])
 }
 
 model Subtask {
-  id Int @id @default(autoincrement())
-  name String
+  id          Int        @id @default(autoincrement())
+  name        String
   description String
-  status TaskStatus
-  task_id Int
-  created_by Int
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  status      TaskStatus
+  task_id     Int
+  created_by  Int
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @default(now()) @updatedAt
 
   creater User @relation(fields: [created_by], references: [id])
-  task Task @relation(fields: [task_id], references: [id])
+  task    Task @relation(fields: [task_id], references: [id])
 }
 
 model TaskParticipants {
   user_id Int
-  role Role
+  role    Role
   task_id Int
-  @@id([task_id, user_id])
 
   user User @relation(fields: [user_id], references: [id])
   task Task @relation(fields: [task_id], references: [id])
+
+  @@id([task_id, user_id])
+}
+
+model Chats {
+  id         Int      @id @default(autoincrement())
+  type       ChatType @default(private)
+  name       String?
+  image_url  String?
+  created_by Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  user             User?              @relation(fields: [created_by], references: [id])
+  chat_participant ChatParticipants[]
+  message          Messages[]
+}
+
+model ChatParticipants {
+  id           Int      @id @default(autoincrement())
+  chat_id      Int
+  user_id      Int
+  joined_at    DateTime @default(now())
+  last_read_at DateTime
+
+  chat Chats @relation(fields: [chat_id], references: [id])
+  user User  @relation(fields: [user_id], references: [id])
+}
+
+model Messages {
+  id         Int      @id @default(autoincrement())
+  chat_id    Int
+  sender_id  Int
+  content    String?
+  file       String?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  deleted_at DateTime
+
+  chat Chats @relation(fields: [chat_id], references: [id])
+  user User  @relation(fields: [sender_id], references: [id])
+}
+
+model Activities {
+  id           Int            @id @default(autoincrement())
+  action       ActivityAction
+  message      String
+  task_id      Int?
+  subtask_id   Int?
+  meta_data    Json?
+  performed_by Int
+  user         User           @relation(fields: [performed_by], references: [id])
+  created_at   DateTime       @default(now())
+
+  @@index([performed_by])
 }
