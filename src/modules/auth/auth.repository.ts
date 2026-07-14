@@ -32,7 +32,7 @@ export async function findSessionById(id: string) {
             refresh_token: true,
             expires_at: true,
             user: {
-                select: {role: true, id: true}
+                select: {role: true, id: true, name: true}
             },
         }
     });

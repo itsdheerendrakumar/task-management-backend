@@ -74,8 +74,8 @@ export const getActivityMessage = {
 
   user_deactivated: (userName: string) =>
     `deactivated user ${userName}`,
-  user_logged_in: (userName: string, userId: number) =>
-    `${userName} (ID: ${userId}) logged in`,
-  user_logged_out: (userId: number) =>
-    `(ID: ${userId}) logged out`,
+  user_logged_in: (userName: string) =>
+    `${userName} logged in`,
+  user_logged_out: (userName: string) =>
+    `${userName} logged out`,
 } as const;

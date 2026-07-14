@@ -6,6 +6,8 @@ import { ErrorResponse } from "../../utils/errorResponse";
 import { comparePassword } from "../../utils/comparePassword";
 import { hashPassword } from "../../utils/hashPassword";
 import { changePasswordSchema } from "./user.validation";
+import { createActivity } from "../activity/activity.repository";
+import { getActivityMessage } from "../activity/activity.utils";
 
 export type ChangeProfilePayload = {
     profile_image?: string | null;
@@ -58,6 +60,11 @@ export async function changeProfileService(userId: number | undefined | null, pa
     if (!updates.profile_image) throw new ErrorResponse("No profile image to update", 400);
 
     const user = await updateProfileRepository(userId!, updates);
+    createActivity({
+        action: "user_updated",
+        performed_by: userId!,
+        message: getActivityMessage.user_updated(user.name ?? "")
+    });
     return user;
 }
 
@@ -76,5 +83,10 @@ export async function changePasswordService(userId: number | undefined | null, p
 
     const hashedPassword = hashPassword(validatedPayload.newPassword);
     const user = await updatePasswordRepository(userId, hashedPassword);
+    createActivity({
+        action: "user_updated",
+        performed_by: userId,
+        message: getActivityMessage.user_updated(user.name ?? "")
+    });
     return user;
 }
