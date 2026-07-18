@@ -19,7 +19,7 @@ export type ChangePasswordPayload = {
     newPassword: string;
 };
 
-export async function getProfileService(userId: number) {
+export async function getProfileService(userId: string) {
     const user = await getProfileRepository(userId);
     return user;
 }
@@ -34,7 +34,7 @@ export async function getUserSelectListingService(roles: UserRoles[]) {
     return listing
 }
 
-export async function changeProfileService(userId: number | undefined | null, payload: ChangeProfilePayload) {
+export async function changeProfileService(userId: string | undefined | null, payload: ChangeProfilePayload) {
 
     const updates: { profile_image?: string | null } = {};
 
@@ -68,7 +68,7 @@ export async function changeProfileService(userId: number | undefined | null, pa
     return user;
 }
 
-export async function changePasswordService(userId: number | undefined | null, payload: ChangePasswordPayload) {
+export async function changePasswordService(userId: string | undefined | null, payload: ChangePasswordPayload) {
     const validatedPayload = changePasswordSchema.parse(payload);
 
     if (!userId) {
@@ -76,7 +76,7 @@ export async function changePasswordService(userId: number | undefined | null, p
     }
 
     const existingUser = await getUserWithPasswordRepository(userId);
-    const isValidPassword = comparePassword(validatedPayload.currentPassword, existingUser.password);
+    const isValidPassword = comparePassword(validatedPayload.currentPassword, existingUser.password || "");
     if (!isValidPassword) {
         throw new ErrorResponse("Current password is invalid", 400);
     }

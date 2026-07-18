@@ -2,6 +2,8 @@ import express, {type  Response, type Request, type NextFunction } from 'express
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 dotenv.config();
+import { connectDB } from './lib/db.js';
+connectDB();
 import cors from 'cors';
 import router from './routes/index.js';
 const app = express();

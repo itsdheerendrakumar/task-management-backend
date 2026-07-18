@@ -1,58 +1,48 @@
-import { prisma } from "../../lib/prisma";
+import { Activity } from "../../models/Activity.js";
 import type { CreateActivityPayload } from "./activity.dtos";
+
 export async function createActivity(data: CreateActivityPayload) {
-    const activity = await prisma.activities.create({
-        data,
+    const activity = await Activity.create({
+        action: data.action,
+        message: data.message,
+        task_id: data.task_id ? String(data.task_id) : undefined,
+        subtask_id: data.subtask_id ? String(data.subtask_id) : undefined,
+        meta_data: data.meta_data,
+        performed_by: data.performed_by
     });
     return activity;
 }
 
-export async function getActivitiesRepository(userId: number, role: string, page: number, limit: number, filterId?: number) {
-    const userSelect = {
-        select: {
-            name: true,
-            profile_image: true,
-        },
-    };
+export async function getActivitiesRepository(userId: string, role: string, page: number, limit: number, filterId?: string) {
+    const userSelect = 'name profile_image';
+    const skip = (page - 1) * limit;
 
+    let where: any = {};
     if (role === "admin") {
-        const where = filterId ? { performed_by: filterId } : {};
-        const [activities, totalCount] = await Promise.all([
-            prisma.activities.findMany({
-                where,
-                orderBy: { created_at: "desc" },
-                skip: (page - 1) * limit,
-                take: limit,
-                include: { user: userSelect },
-            }),
-            prisma.activities.count({ where }),
-        ]);
-
-        return {
-            data: activities,
-            pagination: {
-                page,
-                limit,
-                totalItems: totalCount,
-                totalPages: Math.ceil(totalCount / limit),
-            },
-        };
+        if (filterId) {
+            where.performed_by = filterId;
+        }
+    } else {
+        where.performed_by = userId;
     }
 
-    const where = { performed_by: userId };
     const [activities, totalCount] = await Promise.all([
-        prisma.activities.findMany({
-            where,
-            orderBy: { created_at: "desc" },
-            skip: (page - 1) * limit,
-            take: limit,
-            include: { user: userSelect },
-        }),
-        prisma.activities.count({ where }),
+        Activity.find(where)
+            .sort({ created_at: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate('performed_by', userSelect),
+        Activity.countDocuments(where)
     ]);
 
+    const mappedActivities = activities.map(act => {
+        const actObj = act.toJSON() as any;
+        actObj.user = actObj.performed_by;
+        return actObj;
+    });
+
     return {
-        data: activities,
+        data: mappedActivities,
         pagination: {
             page,
             limit,
