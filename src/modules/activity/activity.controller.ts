@@ -1,7 +1,7 @@
 import type { NextFunction, Response } from "express";
-import type { CustomRequest } from "../../utils/types";
-import { getActivitiesService } from "./activity.service";
-import { successResponse } from "../../utils/response";
+import type { CustomRequest } from "../../utils/types.js";
+import { getActivitiesService } from "./activity.service.js";
+import { successResponse } from "../../utils/response.js";
 export async function getActivities(req: CustomRequest, res: Response, next: NextFunction) {
     const {page, limit, userId} = req.query;
     const {user_id, role} = req.user ?? {};

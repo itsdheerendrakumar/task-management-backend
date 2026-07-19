@@ -1,5 +1,5 @@
 import { Activity } from "../../models/Activity.js";
-import type { CreateActivityPayload } from "./activity.dtos";
+import type { CreateActivityPayload } from "./activity.dtos.js";
 
 export async function createActivity(data: CreateActivityPayload) {
     const activity = await Activity.create({

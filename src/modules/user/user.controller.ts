@@ -1,7 +1,7 @@
 import type { NextFunction, Response, Request } from "express";
-import { getProfileService, getUserListingService, getUserSelectListingService, changeProfileService, changePasswordService, type ChangeProfilePayload, type ChangePasswordPayload } from "./user.service";
-import { successResponse } from "../../utils/response";
-import type { CustomRequest, UserRoles } from "../../utils/types";
+import { getProfileService, getUserListingService, getUserSelectListingService, changeProfileService, changePasswordService, type ChangeProfilePayload, type ChangePasswordPayload } from "./user.service.js";
+import { successResponse } from "../../utils/response.js";
+import type { CustomRequest, UserRoles } from "../../utils/types.js";
 
 export async function getProfile(req: CustomRequest, res: Response, next: NextFunction) {
     const {user: decoded} = req;

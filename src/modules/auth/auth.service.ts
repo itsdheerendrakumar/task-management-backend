@@ -1,13 +1,13 @@
-import { comparePassword } from "../../utils/comparePassword";
-import { createUuid } from "../../utils/createUuid";
-import { ErrorResponse } from "../../utils/errorResponse";
-import { hashPassword } from "../../utils/hashPassword";
-import { generateToken, verifyToken } from "../../utils/jwt";
-import { createActivity } from "../activity/activity.repository";
-import { getActivityMessage } from "../activity/activity.utils";
-import type { RegisterUser } from "./auth.dtos";
-import { findUserByEmail, storeSession, findSessionById, deleteSessionById, updateSession, creeateNewUser } from "./auth.repository";
-import { loginSchema, registerSchema } from "./auth.validation";
+import { comparePassword } from "../../utils/comparePassword.js";
+import { createUuid } from "../../utils/createUuid.js";
+import { ErrorResponse } from "../../utils/errorResponse.js";
+import { hashPassword } from "../../utils/hashPassword.js";
+import { generateToken, verifyToken } from "../../utils/jwt.js";
+import { createActivity } from "../activity/activity.repository.js";
+import { getActivityMessage } from "../activity/activity.utils.js";
+import type { RegisterUser } from "./auth.dtos.js";
+import { findUserByEmail, storeSession, findSessionById, deleteSessionById, updateSession, creeateNewUser } from "./auth.repository.js";
+import { loginSchema, registerSchema } from "./auth.validation.js";
 import z from "zod"
 export async function loginService(body: z.infer<typeof loginSchema>) {
     const validatedData = loginSchema.parse(body);

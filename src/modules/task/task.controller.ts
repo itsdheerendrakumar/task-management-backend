@@ -1,8 +1,8 @@
 import type { NextFunction, Response } from "express"
-import type { CustomRequest } from "../../utils/types"
-import { successResponse } from "../../utils/response"
-import { createTaskService, getTaskListingService, getTaskMetricsService, getLastOneYearTaskMonthWiseService, updateTaskStatusService } from "./task.service"
-import type { GetTaskPayload, UpdateTaskStatusPayload } from "./task.dtos"
+import type { CustomRequest } from "../../utils/types.js"
+import { successResponse } from "../../utils/response.js"
+import { createTaskService, getTaskListingService, getTaskMetricsService, getLastOneYearTaskMonthWiseService, updateTaskStatusService } from "./task.service.js"
+import type { GetTaskPayload, UpdateTaskStatusPayload } from "./task.dtos.js"
 
 export async function createTask(req: CustomRequest, res: Response, next: NextFunction) {
   const userId = req.user?.user_id

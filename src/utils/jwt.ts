@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import type { DecodedToken } from "./types";
-import { ErrorResponse } from "./errorResponse";
+import type { DecodedToken } from "./types.js";
+import { ErrorResponse } from "./errorResponse.js";
 
 export function generateToken(payload: object, type: "access" | "refresh", duration?: number): string {
     const secretKey = type === "access" ? process.env.JWT_SECRET_ACCESS : process.env.JWT_SECRET_REFRESH;

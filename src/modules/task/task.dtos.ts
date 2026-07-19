@@ -1,6 +1,6 @@
 import z from "zod"
-import type { createTaskSchema, updateTaskStatusSchema } from "./task.validation"
-import type { CustomRequest } from "../../utils/types"
+import type { createTaskSchema, updateTaskStatusSchema } from "./task.validation.js"
+import type { CustomRequest } from "../../utils/types.js"
 
 export type CreateTask = z.infer<typeof createTaskSchema>
 export type UpdateTaskStatus = z.infer<typeof updateTaskStatusSchema>
