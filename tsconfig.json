@@ -39,13 +39,13 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "rootDir": ".",
+    "rootDir": "./src",
     "outDir": "./dist",
     "target": "ES2023",
     "strict": true,
     "esModuleInterop": true,
     "ignoreDeprecations": "6.0"
   },
-  "include": ["src","generated"],
+  "include": ["src"],
   "exclude": ["node_modules","dist"]
 }
