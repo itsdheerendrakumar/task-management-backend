@@ -1,6 +1,6 @@
 import { Task } from "../../models/Task.js";
 import type { UserRoles } from "../../utils/types.js";
-import type { CreateTask, TaskStatus, UpdateTaskStatus } from "./task.dtos";
+import type { CreateTask, TaskStatus, UpdateTaskStatus } from "./task.dtos.js";
 
 export async function createTaskRepository(
   taskData: CreateTask,

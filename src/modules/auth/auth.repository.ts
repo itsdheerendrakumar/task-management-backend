@@ -1,6 +1,6 @@
 import { User } from "../../models/User.js";
 import { Session } from "../../models/Session.js";
-import { type NewUser } from "./auth.dtos";
+import { type NewUser } from "./auth.dtos.js";
 
 export async function findUserByEmail(email: string) {
     const user = await User.findOne({ email });

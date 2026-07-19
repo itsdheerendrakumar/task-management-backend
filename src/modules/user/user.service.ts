@@ -1,13 +1,13 @@
-import type { UserRoles } from "../../utils/types";
-import { getProfileRepository, getUserListingRepository, getUserSelectListingRepository, updateProfileRepository, getUserWithPasswordRepository, updatePasswordRepository } from "./user.repository";
-import { uploadBufferToCloudinary } from "../../lib/cloudinary";
-import cloudinary from "../../lib/cloudinary";
-import { ErrorResponse } from "../../utils/errorResponse";
-import { comparePassword } from "../../utils/comparePassword";
-import { hashPassword } from "../../utils/hashPassword";
-import { changePasswordSchema } from "./user.validation";
-import { createActivity } from "../activity/activity.repository";
-import { getActivityMessage } from "../activity/activity.utils";
+import type { UserRoles } from "../../utils/types.js";
+import { getProfileRepository, getUserListingRepository, getUserSelectListingRepository, updateProfileRepository, getUserWithPasswordRepository, updatePasswordRepository } from "./user.repository.js";
+import { uploadBufferToCloudinary } from "../../lib/cloudinary.js";
+import cloudinary from "../../lib/cloudinary.js";
+import { ErrorResponse } from "../../utils/errorResponse.js";
+import { comparePassword } from "../../utils/comparePassword.js";
+import { hashPassword } from "../../utils/hashPassword.js";
+import { changePasswordSchema } from "./user.validation.js";
+import { createActivity } from "../activity/activity.repository.js";
+import { getActivityMessage } from "../activity/activity.utils.js";
 
 export type ChangeProfilePayload = {
     profile_image?: string | null;
