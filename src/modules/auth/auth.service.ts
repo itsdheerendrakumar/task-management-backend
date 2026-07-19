@@ -65,10 +65,10 @@ export async function refreshTokenService(refreshToken: string) {
     }
     const newAccessToken = generateToken({ id: session.id, user_id: session.user.id, role: session.user.role }, "access");
     const remainingDuration = session.expires_at.getTime() - now;
-    const newRefreshToken = generateToken({ id: session.id, user_id: session.user.id}, "refresh", remainingDuration);
+    const newRefreshToken = generateToken({ id: session.id, user_id: session.user.id}, "refresh", Math.floor(remainingDuration / 1000));
     const hashedToken = hashPassword(newRefreshToken);
     await updateSession(session.id, hashedToken, remainingDuration);
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken, remainingDuration };
 }
 
 export async function logoutService(token: string, type: "access" | "refresh") {
