@@ -8,6 +8,8 @@ import cors from 'cors';
 import router from './routes/index.js';
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true
