@@ -15,7 +15,7 @@ export async function loginService(body: z.infer<typeof loginSchema>) {
     if(!user) {
         throw new ErrorResponse("Invalid credentials", 400);
     }
-    const isMatch = comparePassword(validatedData.password, user?.password);
+    const isMatch = comparePassword(validatedData.password, user.password || "");
     if(!isMatch) {
         throw new ErrorResponse("Invalid credentials", 400);
     }
@@ -23,11 +23,11 @@ export async function loginService(body: z.infer<typeof loginSchema>) {
     const accessToken = generateToken({ id, user_id: user.id, role: user.role }, "access");
     const refreshToken = generateToken({ id, user_id: user.id}, "refresh");
     const hashedToken = hashPassword(refreshToken);
-    await storeSession(user.id, hashedToken, id);
+    await storeSession(user.id!, hashedToken, id);
     createActivity({
         action: "user_login", 
-        performed_by: user.id,
-        message: getActivityMessage.user_logged_in(user.name ?? "", user.id)
+        performed_by: user.id!,
+        message: getActivityMessage.user_logged_in(user.name ?? "")
     });
     return {accessToken, refreshToken};
 }
@@ -40,6 +40,11 @@ export async function registerService(body: RegisterUser) {
     }
     const hashedPassword = hashPassword(validatedData.password);
     const user = await creeateNewUser({...validatedData, password: hashedPassword});
+    createActivity({
+        action: "user_created",
+        performed_by: user.id!,
+        message: getActivityMessage.user_created(user.name ?? "")
+    });
     return user;
 }
 
@@ -68,10 +73,11 @@ export async function refreshTokenService(refreshToken: string) {
 
 export async function logoutService(token: string, type: "access" | "refresh") {
     const decoded = verifyToken(token, type);
+    const session = await findSessionById(decoded.id);
     createActivity({
         action: "user_logout",
         performed_by: decoded.user_id,
-        message: getActivityMessage.user_logged_out(decoded.user_id)
+        message: getActivityMessage.user_logged_out(session?.user?.name ?? "User")
     });
     await deleteSessionById(decoded.id);
 }

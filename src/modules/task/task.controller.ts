@@ -1,8 +1,8 @@
-﻿import type { NextFunction, Response } from "express"
+import type { NextFunction, Response } from "express"
 import type { CustomRequest } from "../../utils/types"
 import { successResponse } from "../../utils/response"
-import { createTaskService, getTaskListingService, getTaskMetricsService, getLastOneYearTaskMonthWiseService} from "./task.service"
-import type { GetTaskPayload } from "./task.dtos"
+import { createTaskService, getTaskListingService, getTaskMetricsService, getLastOneYearTaskMonthWiseService, updateTaskStatusService } from "./task.service"
+import type { GetTaskPayload, UpdateTaskStatusPayload } from "./task.dtos"
 
 export async function createTask(req: CustomRequest, res: Response, next: NextFunction) {
   const userId = req.user?.user_id
@@ -11,10 +11,18 @@ export async function createTask(req: CustomRequest, res: Response, next: NextFu
   return res.status(201).json(successResponse("Task created successfully", task))
 }
 
+export async function updateTaskStatus(req: CustomRequest, res: Response, next: NextFunction) {
+  const { user_id } = req.user!;
+  const taskId = req.params.task_id!;
+  const payload = req.body as UpdateTaskStatusPayload;
+  const task = await updateTaskStatusService(taskId as string, user_id as string, payload);
+  return res.status(200).json(successResponse("Task status updated successfully", task));
+}
+
 export async function getTaskListing(req: GetTaskPayload, res: Response, next: NextFunction) {
-  const {user_id} = req.user!;
-  const {type} = req.query;
-  const listing = await getTaskListingService(user_id, type);
+  const { user_id, role } = req.user!;
+  const { type } = req.query;
+  const listing = await getTaskListingService(user_id, type ?? "both", role);
   return res.status(200).json(successResponse("Task Listing found successfully", listing));
 }
 

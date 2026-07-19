@@ -6,6 +6,8 @@ import { ErrorResponse } from "../../utils/errorResponse";
 import { comparePassword } from "../../utils/comparePassword";
 import { hashPassword } from "../../utils/hashPassword";
 import { changePasswordSchema } from "./user.validation";
+import { createActivity } from "../activity/activity.repository";
+import { getActivityMessage } from "../activity/activity.utils";
 
 export type ChangeProfilePayload = {
     profile_image?: string | null;
@@ -17,7 +19,7 @@ export type ChangePasswordPayload = {
     newPassword: string;
 };
 
-export async function getProfileService(userId: number) {
+export async function getProfileService(userId: string) {
     const user = await getProfileRepository(userId);
     return user;
 }
@@ -32,7 +34,7 @@ export async function getUserSelectListingService(roles: UserRoles[]) {
     return listing
 }
 
-export async function changeProfileService(userId: number | undefined | null, payload: ChangeProfilePayload) {
+export async function changeProfileService(userId: string | undefined | null, payload: ChangeProfilePayload) {
 
     const updates: { profile_image?: string | null } = {};
 
@@ -58,10 +60,15 @@ export async function changeProfileService(userId: number | undefined | null, pa
     if (!updates.profile_image) throw new ErrorResponse("No profile image to update", 400);
 
     const user = await updateProfileRepository(userId!, updates);
+    createActivity({
+        action: "user_updated",
+        performed_by: userId!,
+        message: getActivityMessage.user_updated(user.name ?? "")
+    });
     return user;
 }
 
-export async function changePasswordService(userId: number | undefined | null, payload: ChangePasswordPayload) {
+export async function changePasswordService(userId: string | undefined | null, payload: ChangePasswordPayload) {
     const validatedPayload = changePasswordSchema.parse(payload);
 
     if (!userId) {
@@ -69,12 +76,17 @@ export async function changePasswordService(userId: number | undefined | null, p
     }
 
     const existingUser = await getUserWithPasswordRepository(userId);
-    const isValidPassword = comparePassword(validatedPayload.currentPassword, existingUser.password);
+    const isValidPassword = comparePassword(validatedPayload.currentPassword, existingUser.password || "");
     if (!isValidPassword) {
         throw new ErrorResponse("Current password is invalid", 400);
     }
 
     const hashedPassword = hashPassword(validatedPayload.newPassword);
     const user = await updatePasswordRepository(userId, hashedPassword);
+    createActivity({
+        action: "user_updated",
+        performed_by: userId,
+        message: getActivityMessage.user_updated(user.name ?? "")
+    });
     return user;
 }

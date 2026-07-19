@@ -5,9 +5,9 @@ export interface CreateActivityPayload {
             "subtask_assigned" | "subtask_unassigned" | "subtask_status_changed" |
             "user_created" | "user_updated" | "user_login" | "user_logout" |
             "role_changed" | "user_activated" | "user_deactivated";
-    task_id?: number;
-    subtask_id?: number;
+    task_id?: string | undefined;
+    subtask_id?: string | undefined;
     meta_data?: Record<string, unknown>;
     message: string;
-    performed_by: number;
+    performed_by: string;
 }

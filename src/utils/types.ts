@@ -2,7 +2,7 @@ import {type Request} from "express";
 
 export interface DecodedToken {
     id: string;
-    user_id: number;
+    user_id: string;
     email: string;
     role: UserRoles;
     iat: number;
