@@ -11,12 +11,12 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   const result = await loginService(req.body);
   res.cookie("refreshToken", result.refreshToken, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   res.cookie("accessToken", result.accessToken, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 15 * 60 * 1000,
   });
 
@@ -31,11 +31,13 @@ export async function refreshToken(req: CustomRequest, res: Response, next: Next
   const result = await refreshTokenService(refreshToken);
   res.cookie("refreshToken", result.refreshToken, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: result.remainingDuration,
   });
   res.cookie("accessToken", result.accessToken, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 15 * 60 * 1000,
   });
   res.status(200).json(successResponse("Token refreshed successfully"));
 }
@@ -47,7 +49,7 @@ export async function logout(req: CustomRequest, res: Response, next: NextFuncti
     return res.status(401).json({ success: false, message: "No token provided" });
   }
   await logoutService(token, accessToken ? "access" : "refresh");
-  res.clearCookie("refreshToken", { httpOnly: true, secure: true });
-  res.clearCookie("accessToken", { httpOnly: true, secure: true });
+  res.clearCookie("refreshToken", { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+  res.clearCookie("accessToken", { httpOnly: true, secure: process.env.NODE_ENV === "production" });
   res.status(200).json(successResponse("Logged out successfully"));
 }
