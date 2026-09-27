@@ -1,10 +1,24 @@
 import type { NextFunction, Response } from "express"
 import type { CustomRequest } from "../../utils/types";
-import { createGroupService } from "./message.service.js";
+import { createGroupService, editChatService, getChatListingService } from "./message.service.js";
+import { successResponse } from "../../utils/response";
 
 export async function createGroup(req: CustomRequest, res: Response, next: NextFunction) {
     console.log(req.user);
 
     const response = await createGroupService(req.body, req.user?.user_id as string);
-    res.json(response);
+    return res.status(201).json(successResponse("Group created successfully", response));
+}
+
+export async function getChatListing(req: CustomRequest, res: Response, next: NextFunction) {
+    
+    const response = await getChatListingService(req.user?.user_id as string);
+    
+    return res.status(200).json(successResponse("Chat listing fetched successfully", response));
+}
+
+export async function editChat(req: CustomRequest, res: Response, next: NextFunction) {
+    console.log(req.body);
+    const response = await editChatService(req.body, req.user?.user_id as string);
+    return res.status(200).json(successResponse("Chat edited successfully"));
 }
