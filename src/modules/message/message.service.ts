@@ -1,6 +1,6 @@
-import type { CreateGroup, EditChat } from "./message.dtos.js";
-import { createGroupSchema, editChatSchema } from "./message.validation.js";
-import { createGroupRepository, editChatRepository, getChatListingRepository } from "./messsage.repository.js";
+import type { CreateGroup, EditChat, SaveMessage } from "./message.dtos.js";
+import { createGroupSchema, editChatSchema, saveMessageSchema } from "./message.validation.js";
+import { createGroupRepository, editChatRepository, getChatListingRepository, getMessagesRepository, saveMessageRepository } from "./messsage.repository.js";
 import type {Chat as ChatType} from "../../models/chat.js";
 
 export async function createGroupService(chatData: CreateGroup, userId: string): Promise<ChatType> {
@@ -24,3 +24,15 @@ export async function editChatService(chatData: EditChat, userId: string): Promi
     return;
 
 }
+
+export async function saveMessageService(messageData: SaveMessage, userId: string): Promise<any> {
+    const validatedData = saveMessageSchema.parse(messageData);
+    const response = await saveMessageRepository(validatedData, userId);
+    return response;
+}
+
+export async function getMessagesService(chatId: string, userId: string): Promise<any> {
+    const response = await getMessagesRepository(chatId, userId);
+    return response;
+}
+    

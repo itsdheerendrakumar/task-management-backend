@@ -1,5 +1,6 @@
-import type { CreateGroup, EditChat } from "./message.dtos.js";
+import type { CreateGroup, EditChat, SaveMessage } from "./message.dtos.js";
 import Chat from "../../models/chat.js";
+import Message from "../../models/message.js";
 import ChatParticipant from "../../models/chatParticipant.js";
 import type {Chat as ChatType} from "../../models/chat.js";
 
@@ -27,6 +28,8 @@ export async function getChatListingRepository(userId: string): Promise<any> {
         path: "chat_id",
         select: "type name image_url created_by"
     });
+
+    console.log(chatListing);
 
     const chatIds = chatListing.map((chat) => chat.chat_id._id);
     const chatParticipants = await ChatParticipant.find({
@@ -61,7 +64,7 @@ export async function editChatRepository(chatData: EditChat, userId: string): Pr
     if(chatData.name) {
         await Chat.updateOne({ _id: chatData.chat_id }, { name: chatData.name });
     }
-    
+
     if(chatData.chatParticipants) {
         await ChatParticipant.insertMany(chatData.chatParticipants.map((participantId) => ({
             chat_id: chatData.chat_id,
@@ -70,4 +73,28 @@ export async function editChatRepository(chatData: EditChat, userId: string): Pr
     }
 
     return
+}
+
+export async function saveMessageRepository(messageData: SaveMessage, userId: string): Promise<any> {
+    const newMessage = await Message.create({
+        ...messageData,
+        type: "text",
+        sender_id: userId
+    });
+
+    return newMessage;
+}
+
+export async function getMessagesRepository(chatId: string, userId: string): Promise<any> {
+    const isParticipant = await ChatParticipant.findOne({
+        chat_id: chatId,
+        user_id: userId
+    });
+
+    if (!isParticipant) {
+        throw new Error("User is not a participant in this chat");
+    }
+
+    const messages = await Message.find({ chat_id: chatId }).populate("sender_id", "name");
+    return messages;
 }

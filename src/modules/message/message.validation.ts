@@ -15,3 +15,12 @@ export const editChatSchema = z.object({
     name: z.string().optional(),
     chatParticipants: z.array(z.string()).optional(),
 });
+
+export const saveMessageSchema = z.object({
+    chat_id: z.string({
+        message: "Chat ID is required",
+    }),
+    content: z.string({
+        message: "Content is required",
+    }),
+});

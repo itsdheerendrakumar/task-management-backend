@@ -3,7 +3,7 @@ import {Schema, model} from 'mongoose';
 interface message {
     _id: any;
     chat_id: any;
-    user_id: any;
+    sender_id: any;
     content: string;
     type: "text" | "image" | "video" | "audio" | "file";
     createdAt: Date;
@@ -16,7 +16,7 @@ const messageSchema = new Schema<message>({
         ref: 'Chat', 
         required: true 
     },
-    user_id: { 
+    sender_id: { 
         type: Schema.Types.ObjectId, 
         ref: 'User', 
         required: true 

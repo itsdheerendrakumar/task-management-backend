@@ -1,7 +1,7 @@
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { authVerification } from "../../middlerware/verifyToken.js"
 import express from "express";
-import { createGroup, editChat, getChatListing } from "./message.controller.js";
+import { createGroup, editChat, getChatListing, getMessages, saveMessage } from "./message.controller.js";
 
 const router = express.Router();
 
@@ -21,6 +21,17 @@ router.get(
     "/chat-listing",
     asyncHandler(authVerification()),
     asyncHandler(getChatListing)
+)
+
+router.post(
+    "/",
+    asyncHandler(authVerification()),
+    asyncHandler(saveMessage)
+)
+router.get(
+    "/:chatId",
+    asyncHandler(authVerification()),
+    asyncHandler(getMessages)
 )
 
 export default router;
