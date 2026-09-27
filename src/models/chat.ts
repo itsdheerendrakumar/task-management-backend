@@ -1,10 +1,10 @@
 import {Schema, model} from 'mongoose';
 
-interface Chat {
+export interface Chat {
     _id: any;
     type: "private" | "group";
     name?: string;
-    created_by: any;
+    created_by?: any;
     image_url?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -23,7 +23,6 @@ const chatSchema = new Schema<Chat>({
     created_by: { 
         type: Schema.Types.ObjectId, 
         ref: 'User', 
-        required: true 
     },
     image_url: { 
         type: String, 
