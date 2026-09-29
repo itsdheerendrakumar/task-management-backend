@@ -4,7 +4,7 @@ import type { UserRoles } from "../../utils/types.js";
 
 export async function getProfileRepository(userId: string) {
     const user = await User.findById(userId).select('name email role profile_image');
-    if(!user) {
+    if (!user) {
         throw new ErrorResponse("User not found", 400);
     }
     return user;
@@ -21,7 +21,7 @@ export async function getUserSelectListingRepository(roles: UserRoles[]) {
 }
 
 export async function getUserWithPasswordRepository(userId: string) {
-    const user = await User.findById(userId).select('password');
+    const user = await User.findById(userId).select('password email');
     if (!user) {
         throw new ErrorResponse("User not found", 400);
     }
@@ -40,7 +40,7 @@ export async function updatePasswordRepository(userId: string, password: string)
     return user;
 }
 
-export async function updateProfileRepository(userId: string, data: {name?: string | null; profile_image?: string | null}) {
+export async function updateProfileRepository(userId: string, data: { name?: string | null; profile_image?: string | null }) {
     const updateData: any = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.profile_image !== undefined) updateData.profile_image = data.profile_image;
