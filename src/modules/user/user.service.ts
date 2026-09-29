@@ -76,6 +76,8 @@ export async function changePasswordService(userId: string | undefined | null, p
     }
 
     const existingUser = await getUserWithPasswordRepository(userId);
+    if(["admin@yopmail.com", "member@yopmail.com", "projectManager@yopmail.com", "client@yopmail.com"].includes(existingUser.email))
+        throw new ErrorResponse("you cannot change password of this user", 400);
     const isValidPassword = comparePassword(validatedPayload.currentPassword, existingUser.password || "");
     if (!isValidPassword) {
         throw new ErrorResponse("Current password is invalid", 400);
