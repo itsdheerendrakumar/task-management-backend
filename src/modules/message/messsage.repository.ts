@@ -82,6 +82,7 @@ export async function saveMessageRepository(messageData: SaveMessage, userId: st
         sender_id: userId
     });
 
+    await newMessage.populate("sender_id", "name");
     return newMessage;
 }
 
@@ -97,4 +98,9 @@ export async function getMessagesRepository(chatId: string, userId: string): Pro
 
     const messages = await Message.find({ chat_id: chatId }).populate("sender_id", "name");
     return messages;
+}
+
+export async function getChatByIdRepository(chatId: string, messageId: string): Promise<any> {
+    const chat = await Message.findOne({ _id: messageId, chat_id: chatId }).populate("sender_id", "name");
+    return chat;
 }
