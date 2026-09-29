@@ -1,7 +1,7 @@
 import type { NextFunction, Response } from "express"
 import type { CustomRequest } from "../../utils/types";
 import { createGroupService, editChatService, getChatByIdservice, getChatListingService, getMessagesService, saveMessageService } from "./message.service.js";
-import { successResponse } from "../../utils/response";
+import { successResponse } from "../../utils/response.js";
 
 export async function createGroup(req: CustomRequest, res: Response, next: NextFunction) {
     console.log(req.user);
