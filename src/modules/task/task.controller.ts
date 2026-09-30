@@ -34,6 +34,6 @@ export async function getTaskMetrics(req: CustomRequest, res: Response, next: Ne
 
 export async function getLastOneYearTaskMonthWise(req: CustomRequest, res: Response, next: NextFunction) {
   const {user_id, role} = req.user!;
-  const metrics = await getLastOneYearTaskMonthWiseService(user_id);
+  const metrics = await getLastOneYearTaskMonthWiseService(user_id, role);
   return res.status(200).json(successResponse("Task Metrics found successfully", metrics));
 }

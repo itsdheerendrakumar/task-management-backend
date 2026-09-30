@@ -112,18 +112,21 @@ export async function getTaskMetricsRepository(user_id: string, role: UserRoles)
   };
 }
 
-export async function getLastOneYearTaskMonthWiseRepository(user_id: string) {
+export async function getLastOneYearTaskMonthWiseRepository(user_id: string, role: UserRoles) {
   const startDate = new Date();
-  startDate.setMonth(startDate.getMonth() - 11);
   startDate.setDate(1);
   startDate.setHours(0, 0, 0, 0);
+  startDate.setMonth(startDate.getMonth() - 11);
 
-  const tasks = await Task.find({
-    $or: [
+  const query: any = {};
+  if (role !== "admin") {
+    query.$or = [
       { created_by: user_id },
       { "task_participants.user": user_id }
-    ]
-  });
+    ];
+  }
+
+  const tasks = await Task.find(query);
 
   const monthlyData: any[] = [];
   const temp = new Date();

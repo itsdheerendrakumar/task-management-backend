@@ -47,7 +47,7 @@ export async function getTaskMetricsService(user_id: string, role: UserRoles) {
   return metrics;
 }
 
-export async function getLastOneYearTaskMonthWiseService(user_id: string) {
-  const metrics = await getLastOneYearTaskMonthWiseRepository(user_id);
+export async function getLastOneYearTaskMonthWiseService(user_id: string, role: UserRoles) {
+  const metrics = await getLastOneYearTaskMonthWiseRepository(user_id, role);
   return metrics;
 }
