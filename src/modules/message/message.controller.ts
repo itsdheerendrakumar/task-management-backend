@@ -1,6 +1,6 @@
 import type { NextFunction, Response } from "express"
 import type { CustomRequest } from "../../utils/types";
-import { createGroupService, editChatService, getChatByIdservice, getChatListingService, getMessagesService, saveMessageService } from "./message.service.js";
+import { createGroupService, editChatService, getChatListingService, getMessagesService, saveMessageService } from "./message.service.js";
 import { successResponse } from "../../utils/response.js";
 
 export async function createGroup(req: CustomRequest, res: Response, next: NextFunction) {
@@ -33,10 +33,4 @@ export async function getMessages(req: CustomRequest, res: Response, next: NextF
     const { chatId } = req.params;
     const response = await getMessagesService(chatId as string, req.user?.user_id as string);
     return res.status(200).json(successResponse("Messages fetched successfully", response));
-}
-
-export async function getChatById(req: CustomRequest, res: Response, next: NextFunction) {
-    const { chatId, messageId } = req.params;
-    const response = await getChatByIdservice(chatId as string, messageId as string);
-    return res.status(200).json(successResponse("Chat fetched successfully", response));
 }

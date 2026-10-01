@@ -40,6 +40,13 @@ export async function getChatListingRepository(userId: string): Promise<any> {
         select: "name"
     });
 
+    const lastMessages = await Message.aggregate([
+        { $match: { chat_id: { $in: chatIds } } },
+        { $sort: { createdAt: -1 } },
+        { $group: { _id: "$chat_id", lastMessage: { $first: "$$ROOT" } } }
+    ]);
+
+    console.log(lastMessages);
 
     const chatParticipantsMap = chatParticipants.reduce((acc, participant) => {
         const chatId = participant.chat_id._id.toString();
@@ -53,7 +60,8 @@ export async function getChatListingRepository(userId: string): Promise<any> {
 
     const chatsWithParticipants = chatListing.map((chat) => ({
         ...chat.chat_id.toObject(),
-        participants: chatParticipantsMap[chat.chat_id._id.toString()] || []
+        participants: chatParticipantsMap[chat.chat_id._id.toString()] || [],
+        lastMessage: lastMessages.find((msg) => msg._id.toString() === chat.chat_id._id.toString())?.lastMessage || null
     }));
 
     return chatsWithParticipants;
@@ -98,9 +106,4 @@ export async function getMessagesRepository(chatId: string, userId: string): Pro
 
     const messages = await Message.find({ chat_id: chatId }).populate("sender_id", "name");
     return messages;
-}
-
-export async function getChatByIdRepository(chatId: string, messageId: string): Promise<any> {
-    const chat = await Message.findOne({ _id: messageId, chat_id: chatId }).populate("sender_id", "name");
-    return chat;
 }

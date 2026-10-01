@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("message", (data) => {
-    const chatId = data.chatId;
+    const chatId = data.chat_id;
     console.log("message received", data);
     socket.to(chatId).emit("message", data);
   });
