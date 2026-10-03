@@ -1,11 +1,15 @@
 import type { CreateGroup, EditChat, SaveMessage } from "./message.dtos.js";
 import { createGroupSchema, editChatSchema, saveMessageSchema } from "./message.validation.js";
-import { createGroupRepository, editChatRepository, getChatListingRepository, getMessagesRepository, saveMessageRepository } from "./messsage.repository.js";
+import { createGroupRepository, editChatRepository, getChatListingRepository, getIndvidualContactsRepository, getMessagesRepository, saveMessageRepository } from "./messsage.repository.js";
 import type {Chat as ChatType} from "../../models/chat.js";
+import { ErrorResponse } from "../../utils/errorResponse.js";
 
-export async function createGroupService(chatData: CreateGroup, userId: string): Promise<ChatType> {
+export async function createGroupService(chatData: CreateGroup, userId: string, userRole: string): Promise<ChatType> {
 
     const validatedData = createGroupSchema.parse(chatData);
+    if (validatedData.type === "group" && userRole !== "admin") {
+        throw new ErrorResponse("Only admin can create group chats", 403);
+    }
     const response = await createGroupRepository(validatedData, userId);
     return response;
 
@@ -36,3 +40,7 @@ export async function getMessagesService(chatId: string, userId: string): Promis
     return response;
 }
     
+export async function getIndvidualContactsService(): Promise<any> {
+    const response = await getIndvidualContactsRepository();
+    return response;
+}

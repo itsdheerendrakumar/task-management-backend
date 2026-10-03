@@ -3,6 +3,7 @@ import Chat from "../../models/chat.js";
 import Message from "../../models/message.js";
 import ChatParticipant from "../../models/chatParticipant.js";
 import type {Chat as ChatType} from "../../models/chat.js";
+import { User } from "../../models/User.js";
 
 export async function createGroupRepository(chatData: CreateGroup, userId?: string): Promise<ChatType> {
     const { chatParticipants = [], type, name } = chatData;
@@ -29,7 +30,7 @@ export async function getChatListingRepository(userId: string): Promise<any> {
         select: "type name image_url created_by"
     });
 
-    console.log(chatListing);
+    // console.log(chatListing);
 
     const chatIds = chatListing.map((chat) => chat.chat_id._id);
     const chatParticipants = await ChatParticipant.find({
@@ -45,8 +46,6 @@ export async function getChatListingRepository(userId: string): Promise<any> {
         { $sort: { createdAt: -1 } },
         { $group: { _id: "$chat_id", lastMessage: { $first: "$$ROOT" } } }
     ]);
-
-    console.log(lastMessages);
 
     const chatParticipantsMap = chatParticipants.reduce((acc, participant) => {
         const chatId = participant.chat_id._id.toString();
@@ -106,4 +105,10 @@ export async function getMessagesRepository(chatId: string, userId: string): Pro
 
     const messages = await Message.find({ chat_id: chatId }).populate("sender_id", "name");
     return messages;
+}
+
+export async function getIndvidualContactsRepository(): Promise<any> {
+    console.log("Fetching individual contacts");
+    const contacts = await User.find({ role: { $ne: "client" } }).select('name email role profile_image');
+    return contacts;
 }
