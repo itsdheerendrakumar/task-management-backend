@@ -1,6 +1,6 @@
 import type { CreateGroup, EditChat, SaveMessage } from "./message.dtos.js";
 import { createGroupSchema, editChatSchema, saveMessageSchema } from "./message.validation.js";
-import { createGroupRepository, editChatRepository, getChatListingRepository, getIndvidualContactsRepository, getMessagesRepository, saveMessageRepository, markAsReadRepository } from "./messsage.repository.js";
+import { createGroupRepository, editChatRepository, getChatListingRepository, getIndvidualContactsRepository, getMessagesRepository, saveMessageRepository, markAsReadRepository, getTotalPendingMessagesRepository } from "./messsage.repository.js";
 import type {Chat as ChatType} from "../../models/chat.js";
 import { ErrorResponse } from "../../utils/errorResponse.js";
 
@@ -46,5 +46,10 @@ export async function markAsReadService(chatId: string, userId: string): Promise
     
 export async function getIndvidualContactsService(): Promise<any> {
     const response = await getIndvidualContactsRepository();
+    return response;
+}
+
+export async function getTotalPendingMessagesService(userId: string): Promise<number> {
+    const response = await getTotalPendingMessagesRepository(userId);
     return response;
 }

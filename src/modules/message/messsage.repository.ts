@@ -2,8 +2,9 @@ import type { CreateGroup, EditChat, SaveMessage } from "./message.dtos.js";
 import Chat from "../../models/chat.js";
 import Message from "../../models/message.js";
 import ChatParticipant from "../../models/chatParticipant.js";
-import type {Chat as ChatType} from "../../models/chat.js";
+import type { Chat as ChatType } from "../../models/chat.js";
 import { User } from "../../models/User.js";
+import mongoose from "mongoose";
 
 export async function createGroupRepository(chatData: CreateGroup, userId?: string): Promise<ChatType> {
     const { chatParticipants = [], type, name } = chatData;
@@ -12,23 +13,23 @@ export async function createGroupRepository(chatData: CreateGroup, userId?: stri
     const participants = [...chatParticipants, userId]?.map((participantId) => ({
         chat_id: newChat._id,
         user_id: participantId,
-        
+
     }));
 
     const newChatParticipants = await ChatParticipant.insertMany(participants)
-    
+
     return newChat;
 }
 
 export async function getChatListingRepository(userId: string): Promise<any> {
-    
+
     const chatListing = await ChatParticipant.find({
         user_id: userId
     })
-    .populate({
-        path: "chat_id",
-        select: "type name image_url created_by"
-    });
+        .populate({
+            path: "chat_id",
+            select: "type name image_url created_by"
+        });
 
     // console.log(chatListing);
 
@@ -36,10 +37,10 @@ export async function getChatListingRepository(userId: string): Promise<any> {
     const chatParticipants = await ChatParticipant.find({
         chat_id: { $in: chatIds }
     })
-    .populate({
-        path: "user_id",
-        select: "name"
-    });
+        .populate({
+            path: "user_id",
+            select: "name"
+        });
 
     const lastMessages = await Message.aggregate([
         { $match: { chat_id: { $in: chatIds } } },
@@ -69,11 +70,11 @@ export async function getChatListingRepository(userId: string): Promise<any> {
 
 export async function editChatRepository(chatData: EditChat, userId: string): Promise<void> {
 
-    if(chatData.name) {
+    if (chatData.name) {
         await Chat.updateOne({ _id: chatData.chat_id }, { name: chatData.name });
     }
 
-    if(chatData.chatParticipants) {
+    if (chatData.chatParticipants) {
         await ChatParticipant.insertMany(chatData.chatParticipants.map((participantId) => ({
             chat_id: chatData.chat_id,
             user_id: participantId,
@@ -126,4 +127,12 @@ export async function getIndvidualContactsRepository(): Promise<any> {
     console.log("Fetching individual contacts");
     const contacts = await User.find({ role: { $ne: "client" } }).select('name email role profile_image');
     return contacts;
+}
+
+export async function getTotalPendingMessagesRepository(userId: string): Promise<any> {
+    const totalPendingMessages = await ChatParticipant.aggregate([
+        { $match: { user_id: new mongoose.Types.ObjectId(userId) } },
+        { $group: { _id: null, totalUnread: { $sum: "$unread_count" } } }
+    ]);
+    return { unread_count: totalPendingMessages[0]?.totalUnread || 0 };
 }

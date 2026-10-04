@@ -1,7 +1,7 @@
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { authVerification } from "../../middlerware/verifyToken.js"
 import express from "express";
-import { createGroup, editChat, getChatListing, getIndvidualContacts, getMessages, saveMessage, markAsRead } from "./message.controller.js";
+import { createGroup, editChat, getChatListing, getIndvidualContacts, getMessages, saveMessage, markAsRead, getTotalPendingMessages } from "./message.controller.js";
 
 const router = express.Router();
 
@@ -35,6 +35,12 @@ router.get(
     "/contact",
     asyncHandler(authVerification()),
     asyncHandler(getIndvidualContacts)
+)
+
+router.get(
+    "/unread-count",
+    asyncHandler(authVerification()),
+    asyncHandler(getTotalPendingMessages)
 )
 
 router.get(

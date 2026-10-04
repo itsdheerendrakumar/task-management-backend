@@ -1,6 +1,6 @@
 import type { NextFunction, Response } from "express"
 import type { CustomRequest } from "../../utils/types";
-import { createGroupService, editChatService, getChatListingService, getMessagesService, saveMessageService, getIndvidualContactsService, markAsReadService } from "./message.service.js";
+import { createGroupService, editChatService, getChatListingService, getMessagesService, saveMessageService, getIndvidualContactsService, markAsReadService, getTotalPendingMessagesService } from "./message.service.js";
 import { successResponse } from "../../utils/response.js";
 
 export async function createGroup(req: CustomRequest, res: Response, next: NextFunction) {
@@ -45,4 +45,9 @@ export async function getIndvidualContacts(req: CustomRequest, res: Response, ne
     console.log("Fetching individual contacts in controller");
     const response = await getIndvidualContactsService();
     return res.status(200).json(successResponse("Individual contacts fetched successfully", response));
+}
+
+export async function getTotalPendingMessages(req: CustomRequest, res: Response, next: NextFunction) {
+    const response = await getTotalPendingMessagesService(req.user?.user_id as string);
+    return res.status(200).json(successResponse("Total pending messages fetched successfully", response));
 }
