@@ -1,6 +1,6 @@
 import type { CreateGroup, EditChat, SaveMessage } from "./message.dtos.js";
 import { createGroupSchema, editChatSchema, saveMessageSchema } from "./message.validation.js";
-import { createGroupRepository, editChatRepository, getChatListingRepository, getIndvidualContactsRepository, getMessagesRepository, saveMessageRepository } from "./messsage.repository.js";
+import { createGroupRepository, editChatRepository, getChatListingRepository, getIndvidualContactsRepository, getMessagesRepository, saveMessageRepository, markAsReadRepository } from "./messsage.repository.js";
 import type {Chat as ChatType} from "../../models/chat.js";
 import { ErrorResponse } from "../../utils/errorResponse.js";
 
@@ -38,6 +38,10 @@ export async function saveMessageService(messageData: SaveMessage, userId: strin
 export async function getMessagesService(chatId: string, userId: string): Promise<any> {
     const response = await getMessagesRepository(chatId, userId);
     return response;
+}
+
+export async function markAsReadService(chatId: string, userId: string): Promise<void> {
+    await markAsReadRepository(chatId, userId);
 }
     
 export async function getIndvidualContactsService(): Promise<any> {

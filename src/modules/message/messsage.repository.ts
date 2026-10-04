@@ -60,7 +60,8 @@ export async function getChatListingRepository(userId: string): Promise<any> {
     const chatsWithParticipants = chatListing.map((chat) => ({
         ...chat.chat_id.toObject(),
         participants: chatParticipantsMap[chat.chat_id._id.toString()] || [],
-        lastMessage: lastMessages.find((msg) => msg._id.toString() === chat.chat_id._id.toString())?.lastMessage || null
+        lastMessage: lastMessages.find((msg) => msg._id.toString() === chat.chat_id._id.toString())?.lastMessage || null,
+        unread_count: chat.unread_count || 0
     }));
 
     return chatsWithParticipants;
@@ -89,6 +90,11 @@ export async function saveMessageRepository(messageData: SaveMessage, userId: st
         sender_id: userId
     });
 
+    await ChatParticipant.updateMany(
+        { chat_id: messageData.chat_id, user_id: { $ne: userId } },
+        { $inc: { unread_count: 1 } }
+    );
+
     await newMessage.populate("sender_id", "name");
     return newMessage;
 }
@@ -102,9 +108,18 @@ export async function getMessagesRepository(chatId: string, userId: string): Pro
     if (!isParticipant) {
         throw new Error("User is not a participant in this chat");
     }
-
+    isParticipant.last_read_at = new Date();
+    isParticipant.unread_count = 0;
+    await isParticipant.save();
     const messages = await Message.find({ chat_id: chatId }).populate("sender_id", "name");
     return messages;
+}
+
+export async function markAsReadRepository(chatId: string, userId: string): Promise<void> {
+    await ChatParticipant.updateOne(
+        { chat_id: chatId, user_id: userId },
+        { $set: { unread_count: 0, last_read_at: new Date() } }
+    );
 }
 
 export async function getIndvidualContactsRepository(): Promise<any> {
