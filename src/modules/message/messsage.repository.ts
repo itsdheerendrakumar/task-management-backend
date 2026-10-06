@@ -84,10 +84,9 @@ export async function editChatRepository(chatData: EditChat, userId: string): Pr
     return
 }
 
-export async function saveMessageRepository(messageData: SaveMessage, userId: string): Promise<any> {
+export async function saveMessageRepository(messageData: any, userId: string): Promise<any> {
     const newMessage = await Message.create({
         ...messageData,
-        type: "text",
         sender_id: userId
     });
 
@@ -135,4 +134,22 @@ export async function getTotalPendingMessagesRepository(userId: string): Promise
         { $group: { _id: null, totalUnread: { $sum: "$unread_count" } } }
     ]);
     return { unread_count: totalPendingMessages[0]?.totalUnread || 0 };
+}
+
+export async function getMessageFileRepository(messageId: string, userId: string): Promise<any> {
+    const message = await Message.findById(messageId);
+    if (!message) {
+        throw new Error("Message not found");
+    }
+
+    const isParticipant = await ChatParticipant.findOne({
+        chat_id: message.chat_id,
+        user_id: userId
+    });
+
+    if (!isParticipant) {
+        throw new Error("User is not a participant in this chat");
+    }
+
+    return message;
 }

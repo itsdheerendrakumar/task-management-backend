@@ -7,9 +7,12 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
 
-export async function uploadBufferToCloudinary(buffer: Buffer, mimetype: string, folder = "taskManagement") {
+export async function uploadBufferToCloudinary(buffer: Buffer, mimetype: string, folder = "taskManagement", type?: string) {
     const dataUri = `data:${mimetype};base64,${buffer.toString("base64")}`;
-    const result = await cloudinary.uploader.upload(dataUri, { folder });
+    const result = await cloudinary.uploader.upload(dataUri, { 
+        folder,
+        ...(type && { type })
+    });
     return result;
 }
 

@@ -1,8 +1,9 @@
 import type { CreateGroup, EditChat, SaveMessage } from "./message.dtos.js";
 import { createGroupSchema, editChatSchema, saveMessageSchema } from "./message.validation.js";
-import { createGroupRepository, editChatRepository, getChatListingRepository, getIndvidualContactsRepository, getMessagesRepository, saveMessageRepository, markAsReadRepository, getTotalPendingMessagesRepository } from "./messsage.repository.js";
+import { createGroupRepository, editChatRepository, getChatListingRepository, getIndvidualContactsRepository, getMessagesRepository, saveMessageRepository, markAsReadRepository, getTotalPendingMessagesRepository, getMessageFileRepository } from "./messsage.repository.js";
 import type {Chat as ChatType} from "../../models/chat.js";
 import { ErrorResponse } from "../../utils/errorResponse.js";
+import cloudinary, { uploadBufferToCloudinary } from "../../lib/cloudinary.js";
 
 export async function createGroupService(chatData: CreateGroup, userId: string, userRole: string): Promise<ChatType> {
 
@@ -29,9 +30,34 @@ export async function editChatService(chatData: EditChat, userId: string): Promi
 
 }
 
-export async function saveMessageService(messageData: SaveMessage, userId: string): Promise<any> {
+export async function saveMessageService(messageData: SaveMessage, userId: string, file?: Express.Multer.File): Promise<any> {
     const validatedData = saveMessageSchema.parse(messageData);
-    const response = await saveMessageRepository(validatedData, userId);
+    
+    if (!validatedData.content?.trim() && !file) {
+        throw new ErrorResponse("Message must contain either text content or an attachment", 400);
+    }
+    
+    let attachment_public_id = "";
+    let attachment_format = "";
+
+    if (file) {
+        const uploaded = await uploadBufferToCloudinary(
+            file.buffer, 
+            file.mimetype, 
+            "taskManagement/message", 
+            "authenticated"
+        );
+        attachment_public_id = uploaded.public_id;
+        attachment_format = uploaded.format || file.mimetype.split("/")[1] || "";
+    }
+
+    const payloadToSave = {
+        ...validatedData,
+        ...(attachment_public_id && { attachment_public_id }),
+        ...(attachment_format && { attachment_format })
+    };
+
+    const response = await saveMessageRepository(payloadToSave, userId);
     return response;
 }
 
@@ -52,4 +78,21 @@ export async function getIndvidualContactsService(): Promise<any> {
 export async function getTotalPendingMessagesService(userId: string): Promise<number> {
     const response = await getTotalPendingMessagesRepository(userId);
     return response;
+}
+
+export async function getMessageFileService(messageId: string, userId: string): Promise<string> {
+    const message = await getMessageFileRepository(messageId, userId);
+    
+    if (!message.attachment_public_id) {
+        throw new ErrorResponse("Message does not have an attachment", 404);
+    }
+
+    // Generate a signed URL valid for 1 hour
+    const url = cloudinary.utils.private_download_url(
+        message.attachment_public_id,
+        message.attachment_format || 'jpg', // Default to jpg if format not stored
+        { expires_at: Math.floor(Date.now() / 1000) + 3600 }
+    );
+
+    return url;
 }

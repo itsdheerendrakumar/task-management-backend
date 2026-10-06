@@ -21,6 +21,6 @@ export const saveMessageSchema = z.object({
         message: "Chat ID is required",
     }),
     content: z.string({
-        message: "Content is required",
-    }),
+        message: "Content must be a string",
+    }).optional().default(""),
 });

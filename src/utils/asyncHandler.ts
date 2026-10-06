@@ -4,6 +4,7 @@ export function asyncHandler(fn: Function) {
     return function (req: Request, res: Response, next: NextFunction) {
         Promise.resolve(fn(req, res, next))
             .catch(error => {
+                console.error("Error in asyncHandler:", error);
                 next(error);
             });
     }

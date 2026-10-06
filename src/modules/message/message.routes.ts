@@ -1,7 +1,8 @@
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { authVerification } from "../../middlerware/verifyToken.js"
 import express from "express";
-import { createGroup, editChat, getChatListing, getIndvidualContacts, getMessages, saveMessage, markAsRead, getTotalPendingMessages } from "./message.controller.js";
+import { createGroup, editChat, getChatListing, getIndvidualContacts, getMessages, saveMessage, markAsRead, getTotalPendingMessages, getMessageFile } from "./message.controller.js";
+import { parseMessagePayload } from "./multer.js";
 
 const router = express.Router();
 
@@ -26,6 +27,7 @@ router.get(
 router.post(
     "/",
     asyncHandler(authVerification()),
+    parseMessagePayload().single("attachment"),
     asyncHandler(saveMessage)
 )
 
@@ -47,6 +49,12 @@ router.get(
     "/:chatId",
     asyncHandler(authVerification()),
     asyncHandler(getMessages)
+)
+
+router.get(
+    "/:messageId/file",
+    asyncHandler(authVerification()),
+    asyncHandler(getMessageFile)
 )
 
 router.patch(
