@@ -57,6 +57,5 @@ export async function getMessageFile(req: CustomRequest, res: Response, next: Ne
     const { messageId } = req.params;
     const url = await getMessageFileService(messageId as string, req.user?.user_id as string);
     
-    // Redirect the client to the generated signed URL
-    return res.redirect(url);
+    return res.status(200).json(successResponse("File URL generated successfully", { url }));
 }
