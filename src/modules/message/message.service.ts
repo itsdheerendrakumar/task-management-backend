@@ -91,7 +91,10 @@ export async function getMessageFileService(messageId: string, userId: string): 
     const url = cloudinary.utils.private_download_url(
         message.attachment_public_id,
         message.attachment_format || 'jpg', // Default to jpg if format not stored
-        { expires_at: Math.floor(Date.now() / 1000) + 3600 }
+        { 
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            type: "authenticated"
+        }
     );
 
     return url;
