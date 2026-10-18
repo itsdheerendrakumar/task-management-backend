@@ -51,3 +51,18 @@ export async function getActivitiesRepository(userId: string, role: string, page
         },
     };
 }
+
+export async function deleteActivitiesRepository(userId: string, role: string, activitiesId: string[]) {
+    if(role === "admin")
+        await Activity.deleteMany({
+            _id: {$in: activitiesId}
+        })
+
+    else
+        await Activity.deleteMany({
+            _id: {$in: activitiesId},
+            performed_by: userId
+        })
+
+    return;
+}
