@@ -27,7 +27,7 @@ export async function loginService(body: z.infer<typeof loginSchema>) {
     createActivity({
         action: "user_login", 
         performed_by: user.id!,
-        message: getActivityMessage.user_logged_in(user.name ?? "")
+        message: getActivityMessage.user_logged_in()
     });
     return {accessToken, refreshToken};
 }
@@ -77,7 +77,7 @@ export async function logoutService(token: string, type: "access" | "refresh") {
     createActivity({
         action: "user_logout",
         performed_by: decoded.user_id,
-        message: getActivityMessage.user_logged_out(session?.user?.name ?? "User")
+        message: getActivityMessage.user_logged_out()
     });
     await deleteSessionById(decoded.id);
 }
